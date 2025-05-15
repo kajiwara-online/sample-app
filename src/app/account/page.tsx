@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { createInventory, updateInventory, deleteInventory } from "./actions";
 import { createClient } from "@/app/utils/supabase/client";
 
@@ -17,6 +18,7 @@ export default function AccountPage() {
   const [item, setItem] = useState("");
   const [stock, setStock] = useState<number>(0);
   const [editStocks, setEditStocks] = useState<Record<string, number>>({});
+  const router = useRouter();
 
   const fetchInventories = async () => {
     const user = await supabase.auth.getUser();
@@ -52,10 +54,23 @@ export default function AccountPage() {
     };
   }, []);
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
   return (
     <main className="bg-gray-100 min-h-screen py-10 px-4">
       <div className="max-w-xl mx-auto">
-        <h1 className="text-xl font-semibold mb-6 border-b pb-2">在庫管理</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-xl font-semibold border-b pb-2">在庫管理</h1>
+          <button
+            onClick={handleLogout}
+            className="text-sm px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-md border text-gray-800"
+          >
+            ログアウト
+          </button>
+        </div>
 
         <form
           onSubmit={async (e) => {

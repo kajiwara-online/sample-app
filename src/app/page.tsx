@@ -1,5 +1,6 @@
-import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return <Link href="/login">ログインページへ</Link>;
+  // Redirect to dashboard from the root page
+  redirect("/login");
 }

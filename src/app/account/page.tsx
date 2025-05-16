@@ -11,13 +11,15 @@ type Inventory = {
   id: string;
   item: string;
   stock: number;
+  threshold: number;
 };
 
 export default function AccountPage() {
   const [inventories, setInventories] = useState<Inventory[]>([]);
   const [item, setItem] = useState("");
-  const [stock, setStock] = useState<number>(0);
+  const [stock, setStock] = useState<string>("");
   const [editStocks, setEditStocks] = useState<Record<string, number>>({});
+  const [threshold, setThreshold] = useState<string>("");
   const router = useRouter();
 
   const fetchInventories = async () => {
@@ -75,9 +77,12 @@ export default function AccountPage() {
         <form
           onSubmit={async (e) => {
             e.preventDefault();
-            await createInventory(item, stock);
+            const stockNumber = Number(stock);
+            const thresholdNumber = Number(threshold);
+            await createInventory(item, stockNumber, thresholdNumber);
             setItem("");
-            setStock(0);
+            setStock("");
+            setThreshold("");
           }}
           className="bg-white border rounded-md p-4 shadow-sm mb-8 space-y-3"
         >
@@ -92,9 +97,17 @@ export default function AccountPage() {
             type="number"
             placeholder="在庫数"
             value={stock}
-            onChange={(e) => setStock(Number(e.target.value))}
+            onChange={(e) => setStock(String(e.target.value))}
             className="w-full border px-3 py-2 rounded-md text-sm"
           />
+          <input
+            type="number"
+            placeholder="通知閾値（例：5 の場合、5 以下になったら通知）"
+            value={threshold}
+            onChange={(e) => setThreshold(String(e.target.value))}
+            className="w-full border px-3 py-2 rounded-md text-sm"
+          />
+
           <button
             type="submit"
             className="w-full bg-gray-800 text-white py-2 rounded-md text-sm hover:bg-gray-700"
@@ -110,7 +123,12 @@ export default function AccountPage() {
               className="bg-white border rounded-md p-4 shadow-sm flex justify-between items-center"
             >
               <div>
-                <p className="text-sm font-medium">{inv.item}</p>
+                <div className="flex">
+                  <p className="text-sm font-medium">{inv.item}</p>
+                  <p className="text-xs text-gray-500 mt-0.5 ml-3">
+                    通知閾値: {inv.threshold ?? "未設定"} 個
+                  </p>
+                </div>
                 <div className="mt-1 flex items-center gap-2">
                   <input
                     type="number"
